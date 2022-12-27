@@ -1,0 +1,17 @@
+version: "3.9"
+
+services:
+
+  anx1:
+    image: ${ANX1_ENV_LIB_ANX1_DOCKER_REGISTRY:-za2619acr0.azurecr.io}/anx0-beta-anx1-lib-anx1
+    build: anx1
+
+  laravel:
+    image: ${ANX1_ENV_LIB_ANX1_DOCKER_REGISTRY:-za2619acr0.azurecr.io}/anx0-beta-anx1-lib-laravel
+    build: laravel
+    ports:
+      - ${ANX1_ENV_LIB_ANX1_PORTSPREFIX_LIB:-199}80:80
+    environment:
+      ANX1_ENV_LIB_LARAVEL_AUTH_ENABLED: ${ANX1_ENV_LIB_LARAVEL_AUTH_ENABLED:-false}
+      ANX1_ENV_LIB_LARAVEL_AUTH_USER: ${ANX1_ENV_LIB_LARAVEL_AUTH_USER:-anx1-lib-laravel}
+      ANX1_ENV_LIB_LARAVEL_AUTH_PASSWD: ${ANX1_ENV_LIB_LARAVEL_AUTH_PASSWD:-}

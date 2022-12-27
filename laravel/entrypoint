@@ -1,0 +1,28 @@
+#!/bin/sh
+
+set -ex
+
+# Basic Auth
+if test "x$ANX1_ENV_LIB_LARAVEL_AUTH_ENABLED" != "xfalse"; then
+
+  /srv/anx1/lib/laravel/create_htpasswd.sh
+
+  cat >> /var/www/html/public/.htaccess <<EOF
+  AuthType Basic
+  AuthName "Basic authentication."
+  AuthUserFile /etc/apache2/.htpasswd
+  require valid-user
+EOF
+
+fi
+
+
+# sqlite db reinitilization when another volume is mounted
+if ! test -f "$ANX1_ENV_LIB_LARAVEL_DB_DATABASE"; then
+  install -d $(dirname "$ANX1_ENV_LIB_LARAVEL_DB_DATABASE")
+  touch "$ANX1_ENV_LIB_LARAVEL_DB_DATABASE"
+  find "$ANX1_ENV_LIB_LARAVEL_DB_SCHEMADIR" -name '*.sql' | sort | while read f; do sqlite3 $ANX1_ENV_LIB_LARAVEL_DB_DATABASE < $f; done
+fi
+
+
+exec docker-php-entrypoint apache2-foreground "$@"
